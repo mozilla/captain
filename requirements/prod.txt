@@ -1,0 +1,3 @@
+# Libraries needed for a production install of captain.
+
+Django==1.5.1
