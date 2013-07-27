@@ -1,3 +1,4 @@
 # Libraries that need to be compiled for the environment they're run in.
 
 MySQL-python==1.2.4
+jinja2==2.7

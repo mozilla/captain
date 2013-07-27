@@ -82,6 +82,7 @@ SECRET_KEY = ''
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
+    'jingo.Loader',
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 )
@@ -101,6 +102,8 @@ ROOT_URLCONF = 'captain.urls'
 WSGI_APPLICATION = 'captain.wsgi.application'
 
 INSTALLED_APPS = (
+    'captain.base',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
