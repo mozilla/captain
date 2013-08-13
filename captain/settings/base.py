@@ -127,6 +127,7 @@ INSTALLED_APPS = (
     'django_browserid',
     'guardian',
     'south',
+    'django_nose',  # Must come after south to replace test command.
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -178,3 +179,9 @@ ANONYMOUS_USER_ID = -1
 # django-browserid configuration
 SITE_URL = 'http://localhost:8000'
 LOGIN_REDIRECT_URL = '/'
+
+# django-nose configuration
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_PLUGINS = [
+    'captain.base.tests.nose_plugins.SilenceSouth'
+]
