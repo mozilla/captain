@@ -103,6 +103,7 @@ WSGI_APPLICATION = 'captain.wsgi.application'
 
 INSTALLED_APPS = (
     'captain.base',
+    'captain.projects',
 
     'south',
 
