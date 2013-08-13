@@ -104,6 +104,8 @@ WSGI_APPLICATION = 'captain.wsgi.application'
 INSTALLED_APPS = (
     'captain.base',
 
+    'south',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
