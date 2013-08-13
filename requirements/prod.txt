@@ -1,4 +1,4 @@
 # Libraries needed for a production install of captain.
 
-Django==1.5.1
+Django==1.5.2
 jingo==0.6.1
