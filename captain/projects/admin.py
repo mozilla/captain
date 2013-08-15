@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from guardian.admin import GuardedModelAdmin
 
-from captain.websites import models
+from captain.projects import models
 
 
 class ProjectAdmin(GuardedModelAdmin):
