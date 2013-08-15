@@ -98,7 +98,20 @@ MIDDLEWARE_CLASSES = (
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
+    'django_browserid.auth.BrowserIDBackend',
     'guardian.backends.ObjectPermissionBackend',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+   'django.contrib.auth.context_processors.auth',
+   'django.core.context_processors.debug',
+   'django.core.context_processors.i18n',
+   'django.core.context_processors.media',
+   'django.core.context_processors.request',
+   'django.core.context_processors.static',
+   'django.core.context_processors.tz',
+   'django.contrib.messages.context_processors.messages',
+   'django_browserid.context_processors.browserid',
 )
 
 ROOT_URLCONF = 'captain.urls'
@@ -109,7 +122,9 @@ WSGI_APPLICATION = 'captain.wsgi.application'
 INSTALLED_APPS = (
     'captain.base',
     'captain.projects',
+    'captain.users',
 
+    'django_browserid',
     'guardian',
     'south',
 
@@ -151,5 +166,15 @@ LOGGING = {
     }
 }
 
+# Template path prefixes that shouldn't use Jinja2.
+JINGO_EXCLUDE_APPS = [
+    'admin',
+    'browserid',
+]
+
 # django-guardian configuration
 ANONYMOUS_USER_ID = -1
+
+# django-browserid configuration
+SITE_URL = 'http://localhost:8000'
+LOGIN_REDIRECT_URL = '/'
