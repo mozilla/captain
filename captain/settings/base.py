@@ -96,6 +96,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)
+
 ROOT_URLCONF = 'captain.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
@@ -105,6 +110,7 @@ INSTALLED_APPS = (
     'captain.base',
     'captain.projects',
 
+    'guardian',
     'south',
 
     'django.contrib.auth',
@@ -144,3 +150,6 @@ LOGGING = {
         },
     }
 }
+
+# django-guardian configuration
+ANONYMOUS_USER_ID = -1
