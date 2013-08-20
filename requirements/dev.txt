@@ -1,3 +1,7 @@
+# Pull in the other land-lovin stuff!
+-r ./compiled.txt
+-r ./prod.txt
+
 # Libraries needed for a development install of captain.
 
 django-nose==1.2

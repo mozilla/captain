@@ -1,22 +1,21 @@
 # These settings override what's in settings/base.py.
 from . import base
 
+import os
 
+
+# Make this unique, and don't share it with anybody.  It cannot be blank.
+SECRET_KEY = ''
+
+# Replace with site protocol, domain, and (optionally) port.
+SITE_URL = 'http://localhost:8000'
+
+# This uses sqlite. If you're doing a production install, then
+# you'll want to use something like postgresql or mysql.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-        'OPTIONS': {
-            'init_command': 'SET storage_engine=InnoDB',
-            'charset': 'utf8',
-            'use_unicode': True,
-        },
-        'TEST_CHARSET': 'utf8',
-        'TEST_COLLATION': 'utf8_general_ci',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(base.ROOT, 'captain.db'),
     }
 }
 
@@ -33,12 +32,6 @@ DEBUG = TEMPLATE_DEBUG = True
 # Is this a development instance? Set this to True on development/master
 # instances and False on stage/prod.
 DEV = True
-
-# Make this unique, and don't share it with anybody.  It cannot be blank.
-SECRET_KEY = ''
-
-# Replace with site protocol, domain, and (optionally) port.
-SITE_URL = 'http://localhost:8000'
 
 # Uncomment this if you are running a local dev instance without HTTPS.
 SESSION_COOKIE_SECURE = not DEV
