@@ -14,7 +14,7 @@
     {{ browserid_info() }}
     <div class="navbar navbar-inverse navbar-static-top">
       <div class="container">
-        <a class="navbar-brand" href="{{ url('base.home') }}">Captain</a>
+        <a class="navbar-brand" href="{{ url('projects.all') }}">Captain</a>
         <p class="navbar-text pull-right">
           {% if not user.is_authenticated() %}
             {{ browserid_login(next=request.get_full_path(), color='dark') }}

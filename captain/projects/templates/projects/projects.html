@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+
+{% set title = 'Projects' %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+  <table class="table table-striped">
+    <tr>
+      <th>Project Name</th>
+      <th>Homepage</th>
+    </tr>
+    {% if object_list %}
+      {% for project in object_list %}
+        <td>{{ project.name }}</td>
+        <td><a href="{{ project.homepage }}" target="_blank">{{ project.homepage }}</a></td>
+      {% endfor %}
+    {% else %}
+      <td colspan="2">No projects found.</td>
+    {% endif %}
+  </table>
+{% endblock %}

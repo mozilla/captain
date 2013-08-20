@@ -10,7 +10,7 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-    url(r'', include('captain.base.urls')),
+    url(r'', include('captain.projects.urls')),
 
     (r'^auth/', include('django_browserid.urls')),
 
