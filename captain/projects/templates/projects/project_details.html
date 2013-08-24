@@ -1,0 +1,41 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+  <h1>Project: {{ project.name }}</h1>
+  <p class="lead"><a href="{{ project.homepage }}">{{ project.homepage }}</a></p>
+
+  {% if user.has_perm('projects.can_run_commands', project) %}
+    <div class="panel panel-primary">
+      <div class="panel-heading"><h2 class="panel-title">Send a command</h2></div>
+      <div class="panel-body">
+        <form method="post" action="{{ url('projects.run_command', project.pk) }}">
+          {{ csrf() }}
+          <div class="form-group">
+            {{ form.command.label }}
+            {{ form.command }}
+          </div>
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  <h2>Command History</h2>
+  <table class="table table-striped">
+    <tr>
+      <th>User</th>
+      <th>Command</th>
+      <th>Date</th>
+    </tr>
+    {% for command in commands %}
+      <tr>
+        <td>{{ command.user.username }}</td>
+        <td>{{ command.command }}</td>
+        <td>{{ command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
+      </tr>
+    {% else %}
+      <td colspan="3">No commands have been run for this project yet.</td>
+    {% endfor %}
+  </table>
+
+{% endblock %}

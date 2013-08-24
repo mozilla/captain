@@ -1,7 +1,9 @@
 # Libraries needed for a production install of captain.
 
 Django==1.5.2
-jingo==0.6.1
-south==0.8.2
-django-guardian==1.1.1
 -e git://github.com/mozilla/django-browserid@8e8ef59f2d#egg=django-browserid
+django-guardian==1.1.1
+jingo==0.6.1
+pika==0.9.13
+pytz==2013b
+south==0.8.2

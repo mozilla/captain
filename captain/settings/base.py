@@ -49,6 +49,9 @@ USE_I18N = False
 # calendars according to the current locale.
 USE_L10N = False
 
+# Use timezone-aware datetimes; they're all stored as UTC.
+USE_TZ = True
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
 MEDIA_ROOT = path('media')

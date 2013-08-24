@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
-from django.test import TestCase
 
 from django_nose.tools import assert_equal
 
+from captain.base.tests import TestCase
 from captain.users.helpers import gravatar_url
 
 

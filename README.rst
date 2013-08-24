@@ -2,8 +2,8 @@
 Hooray for Captain!
 ===================
 
-Captain is the web frontend for the Captain Shove system.
-
+Captain is the web frontend for the `Captain Shove`_ system. It sends commands to the shove_
+daemon, which executes the commands on a remote server.
 
 Project details
 ===============
@@ -37,6 +37,11 @@ Steps:
 9. ``./manage.py sync``
 10. ``./manage.py migrate``
 
+Captain works together with shove_ through RabbitMQ_. In order to interact with shove, you'll need
+to install a local RabbitMQ server; the `RabbitMQ Installation Documentation`_ will tell you how.
+Once you have the server running, you can configure captain to connect to RabbitMQ in
+``captain/settings/local.py``.
+
 
 To test
 =======
@@ -44,3 +49,8 @@ To test
 1. If your virtual environment isn't activated, then do
    ``source venv/bin/activate``
 2. ``python manage.py test``
+
+
+.. _Captain Shove: https://wiki.mozilla.org/Websites/Captain_Shove
+.. _shove: https://github.com/mozilla/shove
+.. _RabbitMQ: http://www.rabbitmq.com/
