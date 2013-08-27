@@ -1,11 +1,10 @@
 from django.core.exceptions import PermissionDenied
 
-from django_nose.tools import assert_raises, assert_true
+from django_nose.tools import assert_raises, assert_equal
 from guardian.shortcuts import assign_perm
 from mock import patch
 
 from captain.base.tests import TestCase
-from captain.projects.models import CommandLog
 from captain.projects.tests import ProjectFactory
 from captain.users.tests import UserFactory
 
@@ -32,6 +31,9 @@ class ProjectTests(TestCase):
         assign_perm('can_run_commands', user, project)
 
         with patch('captain.projects.models.shove') as shove:
-            project.send_command(user, 'asdf')
-        shove.send_command.assert_called_once_with('qwer', 'blah', 'asdf')
-        assert_true(CommandLog.objects.filter(project=project, user=user, command='asdf').exists())
+            log = project.send_command(user, 'asdf')
+        shove.send_command.assert_called_once_with('qwer', 'blah', 'asdf', log.pk)
+
+        assert_equal(log.project, project)
+        assert_equal(log.user, user)
+        assert_equal(log.command, 'asdf')

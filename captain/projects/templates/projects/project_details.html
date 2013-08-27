@@ -26,12 +26,18 @@
       <th>User</th>
       <th>Command</th>
       <th>Date</th>
+      <th>Log</th>
     </tr>
     {% for command in commands %}
       <tr>
         <td>{{ command.user.username }}</td>
         <td>{{ command.command }}</td>
         <td>{{ command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
+        <td>
+          {% if command.logfile %}
+            <a href="{{ command.logfile.url }}">View Log</a>
+          {% endif %}
+        </td>
       </tr>
     {% else %}
       <td colspan="3">No commands have been run for this project yet.</td>
