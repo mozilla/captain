@@ -24,7 +24,8 @@
             {{ browserid_login(next=request.get_full_path(), color='dark') }}
           {% else %}
             {{ gravatar_img(user, size=24) }}
-            {{ user.email }} |
+            {{ user.display_name }} |
+            <a href="{{ url('users.update_profile') }}">Update Profile</a> |
             {{ browserid_logout() }}
           {% endif %}
         </p>

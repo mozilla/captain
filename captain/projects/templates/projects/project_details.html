@@ -30,7 +30,7 @@
     </tr>
     {% for command in commands %}
       <tr>
-        <td>{{ command.user.username }}</td>
+        <td>{{ gravatar_img(command.user, size=24) }} {{ command.user.display_name }}</td>
         <td>{{ command.command }}</td>
         <td>{{ command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
         <td>
