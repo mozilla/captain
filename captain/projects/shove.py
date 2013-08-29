@@ -49,6 +49,7 @@ def send_command(queue, project_name, command, log_key):
         channel.queue_declare(queue=queue, durable=True)
 
         body = json.dumps({
+            'version': '1.0',  # Version of the command format.
             'project': project_name,
             'command': command,
             'log_key': log_key,
