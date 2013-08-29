@@ -37,6 +37,7 @@ class SendCommandTests(MockConnectTestCase):
 
         body = self.channel.basic_publish.call_args[1]['body']
         assert_equal(json.loads(body), {
+            'version': '1.0',
             'project': 'my_project',
             'command': 'asdf',
             'log_key': 75,
@@ -77,8 +78,9 @@ class ConsumeLogsTests(MockConnectTestCase):
         callback = Mock()
         consume = self._get_consume(callback)
 
-        consume(self.channel, Mock(), Mock(), '{"log_key": 75, "output": "test output"}')
-        callback.assert_called_once_with(75, 'test output')
+        consume(self.channel, Mock(), Mock(),
+                '{"log_key": 75, "output": "test output", "version": "1.0", "return_code": 0}')
+        callback.assert_called_once_with(75, 0, 'test output')
 
     @patch('captain.projects.shove.log')
     def test_consumer_invalid_json(self, log):

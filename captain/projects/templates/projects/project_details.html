@@ -26,13 +26,17 @@
       <th>User</th>
       <th>Command</th>
       <th>Date</th>
+      <th>Return Code</th>
       <th>Log</th>
     </tr>
     {% for command in commands %}
-      <tr>
+      <tr {% if not command.return_code is none -%}
+            class="{{ 'success' if command.success else 'danger' }}"
+          {%- endif %}>
         <td>{{ gravatar_img(command.user, size=24) }} {{ command.user.display_name }}</td>
         <td>{{ command.command }}</td>
         <td>{{ command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
+        <td>{{ command.return_code if not command.return_code is none else '' }}</td>
         <td>
           {% if command.logfile %}
             <a href="{{ command.logfile.url }}">View Log</a>

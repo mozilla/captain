@@ -56,7 +56,6 @@ def send_command(queue, project_name, command, log_key):
             'log_queue': settings.LOGGING_QUEUE
         })
         channel.basic_publish(exchange='', routing_key=queue, body=body)
-        connection.close()
 
 
 def consume_logs(callback):
@@ -67,19 +66,20 @@ def consume_logs(callback):
 
     :param callback:
         Callback to run when a log event is received. Expects a callable
-        ``callback(log_key, output)`` where the ``log_key`` parameter is the log key passed to
-        shove (usually the pk of the CommandLog entry in the database) and the ``output`` parameter
-        is the output of the command.
+        ``callback(log_key, return_code, output)`` where the ``log_key`` parameter is the log key
+        passed to shove (usually the pk of the CommandLog entry in the database), and the
+        ``return_code`` and ``output`` parameters are the return code and output of the command.
     """
     def consume(channel, method, properties, body):
         try:
             data = json.loads(body)
             log_key = data['log_key']
+            return_code = data['return_code']
             output = data['output']
         except (ValueError, KeyError):
             log.warning('Could not parse incoming log event: `{0}`.'.format(body))
             return
-        callback(log_key, output)
+        callback(log_key, return_code, output)
 
     with closing(create_connection()) as connection:
         channel = connection.channel()

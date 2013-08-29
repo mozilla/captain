@@ -54,9 +54,20 @@ class CommandLog(models.Model):
             sent=dateformat.format(self.sent, 'U')
         )
     logfile = models.FileField(blank=True, default='', upload_to=_logfile_filename)
+    return_code = models.IntegerField(null=True, default=None)
 
-    def write_log(self, output):
-        self.logfile.save(None, ContentFile(output))
+    @property
+    def success(self):
+        return None if self.return_code is None else self.return_code == 0
+
+    @property
+    def log(self):
+        with self.logfile as f:
+            return f.read()
+
+    @log.setter
+    def log(self, content):
+        self.logfile.save(None, ContentFile(content), save=False)
 
     def __unicode__(self):
         return u'<CommandLog {0}:{1}:{2}>'.format(self.project.name, self.user.username,

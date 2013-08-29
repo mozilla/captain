@@ -9,7 +9,7 @@ from captain.projects.models import CommandLog
 log = logging.getLogger(__name__)
 
 
-def handle_log_event(log_key, output):
+def handle_log_event(log_key, return_code, output):
     try:
         command_log = CommandLog.objects.get(pk=log_key)
     except (CommandLog.DoesNotExist, ValueError):
@@ -17,7 +17,9 @@ def handle_log_event(log_key, output):
         return
 
     log.info('Writing log for {0}.'.format(command_log))
-    command_log.write_log(output)
+    command_log.return_code = return_code
+    command_log.log = output
+    command_log.save()
 
 
 class Command(BaseCommand):
