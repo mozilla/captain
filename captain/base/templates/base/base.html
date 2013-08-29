@@ -12,39 +12,54 @@
   </head>
   <body>
     {{ browserid_info() }}
-    <div class="navbar navbar-inverse navbar-static-top">
+    <div id="non-footer">
+      <div class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+          <a class="navbar-brand" href="{{ url('projects.all') }}">Captain</a>
+          <ul class="nav navbar-nav">
+            <li><a href="{{ url('projects.list') }}">All Projects</a></li>
+            <li><a href="{{ url('projects.mine') }}">My Projects</a></li>
+          </ul>
+          <p class="navbar-text pull-right">
+            {% if not user.is_authenticated() %}
+              {{ browserid_login(next=request.get_full_path(), color='dark') }}
+            {% else %}
+              {{ gravatar_img(user, size=24) }}
+              {{ user.display_name }} |
+              <a href="{{ url('users.update_profile') }}">Update Profile</a> |
+              {{ browserid_logout() }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
       <div class="container">
-        <a class="navbar-brand" href="{{ url('projects.all') }}">Captain</a>
-        <ul class="nav navbar-nav">
-          <li><a href="{{ url('projects.list') }}">All Projects</a></li>
-          <li><a href="{{ url('projects.mine') }}">My Projects</a></li>
-        </ul>
-        <p class="navbar-text pull-right">
-          {% if not user.is_authenticated() %}
-            {{ browserid_login(next=request.get_full_path(), color='dark') }}
+        {% for message in messages %}
+          {% if message.tags in ('warning', 'error') %}
+            {% set tag = 'danger' %}
           {% else %}
-            {{ gravatar_img(user, size=24) }}
-            {{ user.display_name }} |
-            <a href="{{ url('users.update_profile') }}">Update Profile</a> |
-            {{ browserid_logout() }}
+            {% set tag = message.tags %}
           {% endif %}
-        </p>
+          <div class="alert alert-{{ tag }}">{{ message }}</div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+
+
+
+
       </div>
     </div>
-    <div class="container">
-      {% for message in messages %}
-        {% if message.tags in ('warning', 'error') %}
-          {% set tag = 'danger' %}
-        {% else %}
-          {% set tag = message.tags %}
-        {% endif %}
-        <div class="alert alert-{{ tag }}">{{ message }}</div>
-      {% endfor %}
-      {% block content %}{% endblock %}
-      {% block site_js %}
-        <script src="{{ static('js/lib/jquery-2.0.3.min.js') }}"></script>
-        {{ browserid_js() }}
-      {% endblock %}
-    </div>
+    <footer id="footer">
+      <div class="container">
+        <p class="text-muted credit">
+          Made by humans. <a href="https://github.com/mozilla/captain">Available on Github</a>.
+        </p>
+      </div>
+    </footer>
+
+    {% block site_js %}
+      <script src="{{ static('js/lib/jquery-2.0.3.min.js') }}"></script>
+      {{ browserid_js() }}
+    {% endblock %}
   </body>
 </html>
