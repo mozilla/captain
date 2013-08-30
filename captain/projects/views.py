@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 
-from guardian.mixins import PermissionRequiredMixin
+from guardian.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from guardian.shortcuts import get_objects_for_user
 
 from captain.projects.forms import RunCommandForm
@@ -16,7 +16,7 @@ class AllProjects(ListView):
     template_name = 'projects/projects.html'
 
 
-class MyProjects(ListView):
+class MyProjects(LoginRequiredMixin, ListView):
     """List of projects that the current user has permission to run commands on."""
     template_name = 'projects/my_projects.html'
 

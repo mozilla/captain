@@ -1,10 +1,14 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
-from django.views.generic import UpdateView
+from django.views.generic import TemplateView, UpdateView
 
 from guardian.mixins import LoginRequiredMixin
 
 from captain.users.forms import EditProfileForm
+
+
+class Login(TemplateView):
+    template_name = 'users/login.html'
 
 
 class UpdateUserProfile(LoginRequiredMixin, UpdateView):

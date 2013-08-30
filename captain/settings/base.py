@@ -2,6 +2,7 @@
 import os
 from os.path import dirname
 
+from django.core.urlresolvers import reverse_lazy
 from django.utils.functional import lazy
 
 
@@ -182,6 +183,7 @@ ANONYMOUS_USER_ID = -1
 # django-browserid configuration
 SITE_URL = 'http://localhost:8000'
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = reverse_lazy('users.login')
 
 # django-nose configuration
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
