@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+
+{% set page_id = page_id|default(None) %}
+
+{% macro nav_tab(id, link, text) -%}
+  <li {% if page_id == id %}class="active"{% endif %}><a href="{{ link }}">{{ text }}</a></li>
+{%- endmacro %}
+
+{% block content %}
+  <h1>Project: {{ project.name }}</h1>
+  <p class="lead"><a href="{{ project.homepage }}">{{ project.homepage }}</a></p>
+
+  <ul class="nav nav-tabs">
+    {{ nav_tab('history', url('projects.details.history', project.pk), 'Command History') }}
+    {% if user.has_perm('projects.can_run_commands', project) %}
+      {{ nav_tab('run_command', url('projects.details.run_command', project.pk), 'Run Command') }}
+    {% endif %}
+  </ul>
+
+  {% block tab_content %}{% endblock %}
+{% endblock %}

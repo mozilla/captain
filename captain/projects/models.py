@@ -34,7 +34,7 @@ class Project(models.Model):
         return log
 
     def get_absolute_url(self):
-        return reverse('projects.details', args=(self.pk,))
+        return reverse('projects.details.history', args=(self.pk,))
 
     def __unicode__(self):
         return u'<Project {0}>'.format(self.name)

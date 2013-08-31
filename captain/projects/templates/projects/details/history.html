@@ -1,0 +1,33 @@
+{% extends 'projects/details/base.html' %}
+
+{% set page_id = 'history' %}
+
+{% block tab_content %}
+  <h2>Command History</h2>
+    <table class="table table-striped">
+      <tr>
+        <th>User</th>
+        <th>Command</th>
+        <th>Date</th>
+        <th>Return Code</th>
+        <th>Log</th>
+      </tr>
+      {% for command in commands %}
+        <tr {% if not command.return_code is none -%}
+              class="{{ 'success' if command.success else 'danger' }}"
+            {%- endif %}>
+          <td>{{ gravatar_img(command.user, size=24) }} {{ command.user.display_name }}</td>
+          <td>{{ command.command }}</td>
+          <td>{{ command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
+          <td>{{ command.return_code if not command.return_code is none else '' }}</td>
+          <td>
+            {% if command.logfile %}
+              <a href="{{ command.logfile.url }}">View Log</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <td colspan="3">No commands have been run for this project yet.</td>
+      {% endfor %}
+    </table>
+{% endblock %}

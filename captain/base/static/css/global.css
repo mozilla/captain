@@ -11,6 +11,12 @@ body {
     margin: 0 0 -6px;
 }
 
+/* @projects
+-------------------------------------------------- */
+.run-command-panel {
+    margin: 20px 0 0;
+}
+
 /* @footer
 -------------------------------------------------- */
 /* Wrapper for page content to push down footer. */

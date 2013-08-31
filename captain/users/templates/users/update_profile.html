@@ -1,16 +1,12 @@
 {% extends 'base/base.html' %}
 
+{% from 'base/forms.html' import form_field %}
+
 {% block content %}
   <h1>Update Profile</h1>
   <form method="post">
     {{ csrf() }}
-    <div class="form-group {% if form.display_name.errors %}has-error{% endif %}">
-      {{ form.display_name.label_tag(attrs={'class': 'control-label'}) }}
-      {{ form.display_name }}
-      {% for error in form.display_name.errors %}
-        <span class="help-block">{{ error }}</span>
-      {% endfor %}
-    </div>
+    {{ form_field(form.display_name) }}
     <button type="submit" class="btn btn-success">Save profile</button>
   </form>
 {% endblock %}
