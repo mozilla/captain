@@ -14,6 +14,7 @@
     {{ nav_tab('history', url('projects.details.history', project.pk), 'Command History') }}
     {% if user.has_perm('projects.can_run_commands', project) %}
       {{ nav_tab('run_command', url('projects.details.run_command', project.pk), 'Run Command') }}
+      {{ nav_tab('schedule', url('projects.details.schedule', project.pk), 'Command Schedule') }}
     {% endif %}
   </ul>
 

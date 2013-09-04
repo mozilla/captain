@@ -12,4 +12,6 @@ urlpatterns = patterns('',
         name='projects.details.history'),
     url(r'^projects/(?P<pk>\d+)/run_command$', views.RunCommand.as_view(),
         name='projects.details.run_command'),
+    url(r'^projects/(?P<project_id>\d+)/schedule$', views.Schedule.as_view(),
+        name='projects.details.schedule'),
 )

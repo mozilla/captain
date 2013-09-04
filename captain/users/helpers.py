@@ -32,3 +32,9 @@ def gravatar_img(arg, size=80, img_class=None):
         src=gravatar_url(arg, size=size),
         width=size
     ))
+
+
+@register.function
+def user_display(user, gravatar_size=24):
+    """Return HTML for displaying a user on the site, including their gravatar and name."""
+    return Markup(' '.join((gravatar_img(user, size=gravatar_size), user.display_name)))

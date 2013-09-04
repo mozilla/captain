@@ -1,12 +1,17 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
-from django.utils import dateformat
+from django.utils import dateformat, timezone
 
 from captain.projects import shove
+
+
+SCHEDULED_COMMAND_USER = 1  # Constant that represents the "user" that runs scheduled commands.
 
 
 class Project(models.Model):
@@ -24,10 +29,11 @@ class Project(models.Model):
 
     def send_command(self, user, command):
         """Send a command to be executed by shove for this project."""
-        if not user.has_perm('projects.can_run_commands', self):
+        if user == SCHEDULED_COMMAND_USER:
+            user = None  # Scheduled commands have an empty user field.
+        elif not user.has_perm('projects.can_run_commands', self):
             raise PermissionDenied('User `{0}` does not have permission to run command `{1}` on '
                                    'project `{2}`.'.format(user.email, command, self.name))
-
 
         log = CommandLog.objects.create(project=self, user=user, command=command)
         shove.send_command(self.queue, self.project_name, command, log.pk)
@@ -40,10 +46,36 @@ class Project(models.Model):
         return u'<Project {0}>'.format(self.name)
 
 
+class ScheduledCommand(models.Model):
+    """Command that runs automatically at a certain interval."""
+    project = models.ForeignKey(Project)
+    command = models.CharField(max_length=256)
+    user = models.ForeignKey(User)
+
+    INTERVAL_CHOICES = (
+        (15, 'Every 15 Minutes'),
+        (30, 'Every 30 Minutes'),
+        (60, 'Once an hour'),
+        (180, 'Once every 3 hours'),
+        (360, 'Once every 6 hours'),
+        (720, 'Once every 12 hours'),
+        (1440, 'Once a day'),
+    )
+    interval_minutes = models.IntegerField('Interval', choices=INTERVAL_CHOICES, default=15)
+    last_run = models.DateTimeField(null=True)
+
+    @property
+    def is_due(self):
+        if not self.last_run:
+            return True
+        else:
+            return (timezone.now() - self.last_run) > timedelta(minutes=self.interval_minutes)
+
+
 class CommandLog(models.Model):
     """Log of information about a single run of a command."""
     project = models.ForeignKey(Project)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     command = models.CharField(max_length=256)
     sent = models.DateTimeField(auto_now_add=True)
 
@@ -70,5 +102,5 @@ class CommandLog(models.Model):
         self.logfile.save(None, ContentFile(content), save=False)
 
     def __unicode__(self):
-        return u'<CommandLog {0}:{1}:{2}>'.format(self.project.name, self.user.username,
-                                                  self.command)
+        username = self.user.username if self.user else 'The Captain'
+        return u'<CommandLog {0}:{1}:{2}>'.format(self.project.name, username, self.command)

@@ -16,7 +16,7 @@
         <tr {% if not command.return_code is none -%}
               class="{{ 'success' if command.success else 'danger' }}"
             {%- endif %}>
-          <td>{{ gravatar_img(command.user, size=24) }} {{ command.user.display_name }}</td>
+          <td>{{ user_display(command.user) if command.user else 'The Captain' }}</td>
           <td>{{ command.command }}</td>
           <td>{{ command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
           <td>{{ command.return_code if not command.return_code is none else '' }}</td>
