@@ -28,7 +28,7 @@ class MyProjects(LoginRequiredMixin, ListView):
 
 
 class RunCommand(PermissionRequiredMixin, SingleObjectMixin, FormView):
-    """Show a form for running commands on a project."""
+    """Show and process a form for running commands on a project."""
     model = Project
     permission_required = 'projects.can_run_commands'
     form_class = RunCommandForm
@@ -65,7 +65,6 @@ class RunCommand(PermissionRequiredMixin, SingleObjectMixin, FormView):
 
 class ProjectHistory(ListView):
     """Show a list of all the log entries for commands run on a project."""
-    model = Project
     template_name = 'projects/details/history.html'
     context_object_name = 'commands'
 

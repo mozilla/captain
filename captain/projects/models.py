@@ -11,9 +11,6 @@ from django.utils import dateformat, timezone
 from captain.projects import shove
 
 
-SCHEDULED_COMMAND_USER = 1  # Constant that represents the "user" that runs scheduled commands.
-
-
 class Project(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField()
@@ -28,10 +25,21 @@ class Project(models.Model):
         )
 
     def send_command(self, user, command):
-        """Send a command to be executed by shove for this project."""
-        if user == SCHEDULED_COMMAND_USER:
-            user = None  # Scheduled commands have an empty user field.
-        elif not user.has_perm('projects.can_run_commands', self):
+        """
+        Send a command to be executed by shove for this project.
+
+        :param user:
+            User that is running the command. This can be None if the command is being run
+            automatically as a scheduled command.
+
+        :param command:
+            Name of the command to execute.
+
+        :raises:
+            PermissionDenied: If a user is given and that user does not have permission to run a
+            command on this project.
+        """
+        if user and not user.has_perm('projects.can_run_commands', self):
             raise PermissionDenied('User `{0}` does not have permission to run command `{1}` on '
                                    'project `{2}`.'.format(user.email, command, self.name))
 
