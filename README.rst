@@ -5,6 +5,13 @@ Hooray for Captain!
 Captain is the web frontend for the `Captain Shove`_ system. It sends commands to the shove_
 daemon, which executes the commands on a remote server.
 
+.. image:: https://api.travis-ci.org/mozilla/captain.png
+   :target: https://travis-ci.org/mozilla/captain
+
+.. image:: https://coveralls.io/repos/mozilla/captain/badge.png?branch=master
+   :target: https://coveralls.io/r/mozilla/captain?branch=master
+
+
 Project details
 ===============
 
