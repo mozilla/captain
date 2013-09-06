@@ -67,6 +67,7 @@ class ProjectHistory(ListView):
     """Show a list of all the log entries for commands run on a project."""
     template_name = 'projects/details/history.html'
     context_object_name = 'commands'
+    paginate_by = 25
 
     def get_queryset(self):
         self.project = get_object_or_404(Project, pk=self.kwargs['project_id'])

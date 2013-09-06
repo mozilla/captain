@@ -1,5 +1,7 @@
 {% extends 'projects/details/base.html' %}
 
+{% from 'base/pagination.html' import pagination %}
+
 {% set page_id = 'history' %}
 
 {% block tab_content %}
@@ -30,4 +32,6 @@
         <td colspan="3">No commands have been run for this project yet.</td>
       {% endfor %}
     </table>
+
+    {{ pagination(page_obj) }}
 {% endblock %}
