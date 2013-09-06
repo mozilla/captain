@@ -5,4 +5,6 @@ python:
 services: mysql
 install:
   - pip install -r requirements/dev.txt --use-mirrors
+before_script:
+  - mysql -e 'create database captain;'
 script: python manage.py test --noinput
