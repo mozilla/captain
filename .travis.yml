@@ -5,4 +5,4 @@ python:
 services: mysql
 install:
   - pip install -r requirements/dev.txt --use-mirrors
-script: manage.py test --noinput
+script: python manage.py test --noinput
