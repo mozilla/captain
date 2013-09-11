@@ -1,0 +1,47 @@
+# These settings override what's in settings/base.py.
+from . import base
+
+import os
+
+
+# Make this unique, and don't share it with anybody.  It cannot be blank.
+SECRET_KEY = ''
+
+# Replace with site protocol, domain, and (optionally) port.
+SITE_URL = 'http://localhost:8000'
+
+# This uses sqlite. If you're doing a production install, then
+# you'll want to use something like postgresql or mysql.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(base.ROOT, 'captain.db'),
+    }
+}
+
+# RabbitMQ connection settings.
+RABBITMQ_HOST = 'localhost'
+RABBITMQ_PORT = 5672
+RABBITMQ_VHOST = '/'
+RABBITMQ_USER = 'guest'
+RABBITMQ_PASS = 'guest'
+
+# Captain-specific queue settings.
+LOGGING_QUEUE = 'captain_logger'
+
+# Recipients of traceback emails and other notifications.
+ADMINS = (
+    # ('Your Name', 'your_email@domain.com'),
+)
+MANAGERS = ADMINS
+
+# Debugging displays nice error messages, but leaks memory. Set this to False
+# on all server instances and True only for development.
+DEBUG = TEMPLATE_DEBUG = True
+
+# Is this a development instance? Set this to True on development/master
+# instances and False on stage/prod.
+DEV = True
+
+# Uncomment this if you are running a local dev instance without HTTPS.
+SESSION_COOKIE_SECURE = not DEV

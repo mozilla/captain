@@ -1,0 +1,9 @@
+# Pull in the other land-lovin stuff!
+-r ./compiled.txt
+-r ./prod.txt
+
+# Libraries needed for a development install of captain.
+
+django-nose==1.2
+mock==1.0.1
+factory-boy==2.1.2

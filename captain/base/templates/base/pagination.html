@@ -1,0 +1,36 @@
+{% macro pagination(page, range_size=20) -%}
+  {% set half_range = range_size // 2 %}
+  {% set last_page = page.paginator.num_pages %}
+  <ul class="pagination">
+    {% if page.has_previous() %}
+      <li><a href="?page={{ page.previous_page_number() }}">&laquo;</a></li>
+    {% endif %}
+
+    <li {% if page.number == 1 %}class="active"{% endif %}><a href="?page=1">1</a></li>
+
+    {% if page.number - half_range - 1 > 1 %}
+      <li class="disabled"><span>&hellip;</span></li>
+    {% endif %}
+
+    {% set range_start = max((page.number - half_range, 2)) %}
+    {% for number in range(range_start, range_start + range_size) if number < last_page %}
+       <li {% if number == page.number %}class="active"{% endif %}>
+        <a href="?page={{ number }}">{{ number }}</a>
+      </li>
+    {% endfor %}
+
+    {% if page.number + half_range + 1 < last_page %}
+      <li class="disabled"><span>&hellip;</span></li>
+    {% endif %}
+
+    {% if last_page > 1 %}
+      <li {% if page.number == last_page %}class="active"{% endif %}>
+        <a href="?page={{ last_page }}">{{ last_page }}</a>
+      </li>
+    {% endif %}
+
+    {% if page.has_next() %}
+      <li><a href="?page={{ page.next_page_number() }}">&raquo;</a></li>
+    {% endif %}
+  </ul>
+{%- endmacro %}

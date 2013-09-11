@@ -1,0 +1,39 @@
+/* @global
+-------------------------------------------------- */
+html,
+body {
+    height: 100%;
+}
+
+/* @navigation
+-------------------------------------------------- */
+.navbar .persona-button {
+    margin: 0 0 -6px;
+}
+
+/* @projects
+-------------------------------------------------- */
+.run-command-panel {
+    margin: 20px 0 0;
+}
+
+/* @footer
+-------------------------------------------------- */
+/* Wrapper for page content to push down footer. */
+#non-footer {
+    height: auto;
+    margin: 0 auto -61px;
+    min-height: 100%;
+    padding: 0 0 61px;
+}
+
+/* Grey footer at the bottom of the page. */
+#footer {
+    background-color: #F5F5F5;
+    border-top: 1px solid #DDDDDD;
+    height: 61px;
+}
+
+.credit {
+    margin: 20px 0;
+}
