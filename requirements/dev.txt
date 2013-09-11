@@ -7,3 +7,4 @@
 django-nose==1.2
 mock==1.0.1
 factory-boy==2.1.2
+Sphinx
