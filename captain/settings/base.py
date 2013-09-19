@@ -184,9 +184,3 @@ ANONYMOUS_USER_ID = -1
 SITE_URL = 'http://localhost:8000'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = reverse_lazy('users.login')
-
-# django-nose configuration
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_PLUGINS = [
-    'captain.base.tests.nose_plugins.SilenceSouth'
-]
