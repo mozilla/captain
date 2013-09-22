@@ -1,0 +1,17 @@
+SRC_DIR = '/data/captain/src/captain.mozilla.org/captain'
+WWW_DIR = '/data/captain/www/captain.mozilla.org/captain'
+
+#CRON_NAME = 'captain.mozilla.org-gencron'
+
+DEPLOY_SCRIPT = "/data/captain/deploy -n captain.mozilla.org"
+REMOTE_UPDATE_SCRIPT = "/data/bin/update-www.sh captain.mozilla.org"
+
+WEB_HOSTGROUP = 'captain'
+#CELERY_HOSTGROUP = 'captain-celery'
+#CELERY_SERVICE = 'celeryd-captain'
+
+UPDATE_REF = 'origin/master'
+SSH_KEY = None
+
+REMOTE_WSGI = '/data/www/captain.mozilla.org/captain/wsgi/playdoh.wsgi'
+REMOTE_HOSTNAME = 'captain.mozilla.org'
