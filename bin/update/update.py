@@ -51,12 +51,12 @@ def deploy_app(ctx):
 def update_info(ctx, tag):
     with ctx.lcd(settings.SRC_DIR):
         ctx.local("date > static/revision.txt" )
-        ctx.local("git branch > static/revision.txt")
-        ctx.local("git log -3 > static/revision.txt")
-        ctx.local("git status > static/revision.txt")
-        ctx.local("git submodule status > static/revision.txt")
-        ctx.local("python ./manage.py migrate --list > static/revision.txt")
-        ctx.local("git rev-parse HEAD > static/revision.txt")
+        ctx.local("git branch >> static/revision.txt")
+        ctx.local("git log -3 >> static/revision.txt")
+        ctx.local("git status >> static/revision.txt")
+        ctx.local("git submodule status >> static/revision.txt")
+        ctx.local("python ./manage.py migrate --list >> static/revision.txt")
+        ctx.local("git rev-parse HEAD >> static/revision.txt")
 
 
 # these commands are run by Chief by default and so this script
