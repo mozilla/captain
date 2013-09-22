@@ -1,0 +1,1 @@
+push_application: python bin/update/update.py
