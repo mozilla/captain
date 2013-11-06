@@ -3,6 +3,7 @@ from hashlib import md5
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.html import escape
 
 from jingo import register
 from jinja2 import Markup
@@ -37,4 +38,7 @@ def gravatar_img(arg, size=80, img_class=None):
 @register.function
 def user_display(user, gravatar_size=24):
     """Return HTML for displaying a user on the site, including their gravatar and name."""
-    return Markup(' '.join((gravatar_img(user, size=gravatar_size), user.display_name)))
+    return Markup(' '.join((
+        gravatar_img(user, size=gravatar_size),
+        escape(user.display_name)
+    )))
