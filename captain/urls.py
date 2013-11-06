@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 import jingo.monkey
+from commonware.response.cookies.monkeypatch import patch_all as patch_cookies
 
 
 admin.autodiscover()
@@ -29,4 +30,8 @@ if settings.DEBUG:
 
 
 # Monkeypatches!
+# Patch Django to support __html__ for rendering in Jinja.
 jingo.monkey.patch()
+
+# Patch HttpResponse to use secure, httponly cookies by default.
+patch_cookies()
