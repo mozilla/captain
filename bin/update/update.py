@@ -45,24 +45,24 @@ def checkin_changes(ctx):
 @hostgroups(settings.WEB_HOSTGROUP, remote_kwargs={'ssh_key': settings.SSH_KEY})
 def deploy_app(ctx):
     ctx.remote(settings.REMOTE_UPDATE_SCRIPT)
-    ctx.remote("/bin/touch %s" % settings.REMOTE_WSGI)
+    ctx.remote('/bin/touch {0}'.format(settings.REMOTE_WSGI))
+
 
 @task
 def update_info(ctx, tag):
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local("date > static/revision.txt" )
-        ctx.local("git branch >> static/revision.txt")
-        ctx.local("git log -3 >> static/revision.txt")
-        ctx.local("git status >> static/revision.txt")
-        ctx.local("git submodule status >> static/revision.txt")
-        ctx.local("python ./manage.py migrate --list >> static/revision.txt")
-        ctx.local("git rev-parse HEAD >> static/revision.txt")
+        ctx.local('date')
+        ctx.local('git branch')
+        ctx.local('git log -3')
+        ctx.local('git status')
+        ctx.local('git submodule status')
+        ctx.local('python ./manage.py migrate --list')
+        ctx.local('git rev-parse HEAD > static/revision.txt')
 
 
 # these commands are run by Chief by default and so this script
-## is structured to run the pieces in those, in the order
-## that makes sense.
-
+# is structured to run the pieces in those, in the order
+# that makes sense.
 @task
 def pre_update(ctx, ref=settings.UPDATE_REF):
     update_code(ref)
