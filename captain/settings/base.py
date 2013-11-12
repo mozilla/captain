@@ -184,3 +184,7 @@ ANONYMOUS_USER_ID = -1
 SITE_URL = 'http://localhost:8000'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = reverse_lazy('users.login')
+
+# Use secure cookies.
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
