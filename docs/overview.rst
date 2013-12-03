@@ -119,9 +119,6 @@ There are a few features to point out when evaluating the security of Captain Sh
   able to read or write to certain queues. For example, Shove users should only be able to read
   their own queues and write to the log queue, and the Captain user should only be able to read the
   log queue and write to the Shove queues.
-
-  You can also encapsulate all of these operations in a RabbitMQ virtual host to keep other users
-  away from interacting with the Captain Shove system.
 * Captain uses standard Django username/password authentication for the admin interface, and
   Persona authentication for the user-facing side. Admins can create projects and grant permissions
   (using the `django-guardian`_ library) to certain users to allow them to run commands on a
