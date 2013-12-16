@@ -1,12 +1,26 @@
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from django_nose.tools import assert_equal, assert_false, assert_true
 from mock import Mock, patch, PropertyMock
 
 from captain.base.tests import TestCase
-from captain.projects.management.commands import monitor_shove_logs, process_command_schedule
+from captain.projects.management.commands import (heartbeat, monitor_shove_logs,
+                                                  process_command_schedule)
 from captain.projects.models import CommandLog
-from captain.projects.tests import CommandLogFactory, ScheduledCommandFactory
+from captain.projects.tests import CommandLogFactory, ProjectFactory, ScheduledCommandFactory
+
+
+class HeartbeatTests(TestCase):
+    @override_settings(LOGGING_QUEUE='logging_queue')
+    def test_basic(self):
+        ProjectFactory.create(queue='foo')
+        ProjectFactory.create(queue='foo')  # Test duplicate queues.
+        ProjectFactory.create(queue='bar')
+
+        with patch('captain.projects.management.commands.heartbeat.shove') as shove:
+            heartbeat.Command().handle()
+            shove.send_heartbeat.assert_called_once_with(['foo', 'bar', 'logging_queue'])
 
 
 class MonitorShoveLogsTests(TestCase):

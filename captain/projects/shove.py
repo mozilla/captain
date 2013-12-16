@@ -58,6 +58,21 @@ def send_command(queue, project_name, command, log_key):
         channel.basic_publish(exchange='', routing_key=queue, body=body)
 
 
+def send_heartbeat(queues):
+    """
+    Send a heartbeat message to the specified queues. This helps avoid
+    network issues from lack of activity on the queues.
+    """
+    with closing(create_connection()) as connection:
+        channel = connection.channel()
+
+        for queue in queues:
+            channel.queue_declare(queue=queue, durable=True)
+
+            body = json.dumps({'heartbeat': True})
+            channel.basic_publish(exchange='', routing_key=queue, body=body)
+
+
 def consume_logs(callback):
     """
     Connect to the logging queue and consume any incoming log events.
@@ -73,6 +88,11 @@ def consume_logs(callback):
     def consume(channel, method, properties, body):
         try:
             data = json.loads(body)
+
+            # If this is a heartbeat, exit early.
+            if data.get('heartbeat'):
+                return
+
             log_key = data['log_key']
             return_code = data['return_code']
             output = data['output']
