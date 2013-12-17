@@ -27,5 +27,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Log INFO events to make the commandline output a little more useful.
-        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+        logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=logging.INFO)
         shove.consume_logs(handle_log_event)
