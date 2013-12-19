@@ -1,6 +1,6 @@
 # Django settings for captain project common to all environments.
 import os
-import logging
+import logging.handlers
 from os.path import dirname
 
 from django.core.urlresolvers import reverse_lazy
