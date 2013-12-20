@@ -54,6 +54,30 @@ class SendCommandTests(MockConnectTestCase):
 
 
 @override_settings(LOGGING_QUEUE='test_log_queue')
+class SendHeartbeatTests(MockConnectTestCase):
+    def test_basic_heartbeat(self):
+        heartbeat_json = '{"heartbeat": true}'
+
+        shove.send_heartbeat(['foo', 'bar'])
+
+        self.channel.queue_declare.assert_any_call(queue='foo', durable=True)
+        self.channel.basic_publish.assert_any_call(exchange='', routing_key='foo',
+                                                   body=heartbeat_json)
+        self.channel.queue_declare.assert_any_call(queue='bar', durable=True)
+        self.channel.basic_publish.assert_any_call(exchange='', routing_key='bar',
+                                                   body=heartbeat_json)
+        assert_true(self.connection.close.called)
+
+    def test_always_close(self):
+        """Ensure that the connection is closed even if an exception is thrown."""
+        self.channel.queue_declare.side_effect = IOError
+
+        with assert_raises(IOError):
+            shove.send_heartbeat(['foo', 'bar'])
+        assert_true(self.connection.close.called)
+
+
+@override_settings(LOGGING_QUEUE='test_log_queue')
 class ConsumeLogsTests(MockConnectTestCase):
     def _get_consume(self, callback):
         shove.consume_logs(callback)
@@ -100,4 +124,16 @@ class ConsumeLogsTests(MockConnectTestCase):
 
         consume(self.channel, Mock(), Mock(), '{"blah": "foo", "BAR": 3}')
         assert_true(log.warning.called)
+        assert_true(not callback.called)
+
+    @patch('captain.projects.shove.log')
+    def test_consumer_heartbeat(self, log):
+        """
+        If the consumer receives a heartbeat command, it should return.
+        """
+        callback = Mock()
+        consume = self._get_consume(callback)
+
+        consume(self.channel, Mock(), Mock(), '{"heartbeat": true}')
+        assert_true(not log.warning.called)
         assert_true(not callback.called)
