@@ -28,6 +28,8 @@ RABBITMQ_PASS = 'guest'
 
 # Captain-specific queue settings.
 LOGGING_QUEUE = 'captain_logger'
+HEARTBEAT_QUEUE = 'captain_heartbeat'
+HEARTBEAT_INACTIVE_DELAY = 7 * 60  # Seconds
 
 # Recipients of traceback emails and other notifications.
 ADMINS = (

@@ -12,12 +12,12 @@ from captain.projects import shove
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=255)
     slug = models.SlugField()
     homepage = models.URLField()
 
-    queue = models.CharField(max_length=256)
-    project_name = models.CharField(max_length=256)
+    queue = models.CharField(max_length=255)
+    project_name = models.CharField(max_length=255, unique=True)
 
     class Meta:
         permissions = (
@@ -54,10 +54,19 @@ class Project(models.Model):
         return u'<Project {0}>'.format(self.name)
 
 
+class ShoveInstance(models.Model):
+    """An instance of shove running on a remote server."""
+    routing_key = models.CharField(max_length=255, unique=True)
+    hostname = models.CharField(max_length=255)
+
+    active = models.BooleanField(default=False)
+    last_heartbeat = models.DateTimeField(default=None, null=True)
+
+
 class ScheduledCommand(models.Model):
     """Command that runs automatically at a certain interval."""
     project = models.ForeignKey(Project)
-    command = models.CharField(max_length=256)
+    command = models.CharField(max_length=255)
     user = models.ForeignKey(User)
 
     INTERVAL_CHOICES = (
@@ -84,7 +93,7 @@ class CommandLog(models.Model):
     """Log of information about a single run of a command."""
     project = models.ForeignKey(Project)
     user = models.ForeignKey(User, null=True)
-    command = models.CharField(max_length=256)
+    command = models.CharField(max_length=255)
     sent = models.DateTimeField(auto_now_add=True)
 
     def _logfile_filename(self, filename):

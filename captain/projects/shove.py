@@ -46,7 +46,7 @@ def send_command(queue, project_name, command, log_key):
     """
     with closing(create_connection()) as connection:
         channel = connection.channel()
-        channel.queue_declare(queue=queue, durable=True)
+        channel.queue_declare(queue=queue)
 
         body = json.dumps({
             'version': '1.0',  # Version of the command format.
@@ -73,43 +73,34 @@ def send_heartbeat(queues):
             channel.basic_publish(exchange='', routing_key=queue, body=body)
 
 
-def consume_logs(callback):
+def consume(queue_name, callback):
     """
-    Connect to the logging queue and consume any incoming log events.
+    Connect to the specified queue and consume any incoming data.
 
     This will block until a KeyboardInterrupt is thrown.
 
     :param callback:
         Callback to run when a log event is received. Expects a callable
-        ``callback(log_key, return_code, output)`` where the ``log_key`` parameter is the log key
-        passed to shove (usually the pk of the CommandLog entry in the database), and the
-        ``return_code`` and ``output`` parameters are the return code and output of the command.
+        ``callback(data)`` where data is a dict of the JSON data
+        received.
     """
     def consume(channel, method, properties, body):
         try:
             data = json.loads(body)
-
-            # If this is a heartbeat, exit early.
-            if data.get('heartbeat'):
-                return
-
-            log_key = data['log_key']
-            return_code = data['return_code']
-            output = data['output']
-        except (ValueError, KeyError):
-            log.warning('Could not parse incoming log event: `{0}`.'.format(body))
+        except ValueError:
+            log.warning('Could not parse incoming data as JSON: `{0}`.'.format(body))
             return
-        callback(log_key, return_code, output)
+        callback(data)
 
     with closing(create_connection()) as connection:
         channel = connection.channel()
-        channel.queue_declare(queue=settings.LOGGING_QUEUE, durable=True)
+        channel.queue_declare(queue=queue_name, durable=True)
 
-        channel.basic_consume(consume, queue=settings.LOGGING_QUEUE, no_ack=True)
-        log.info('Listening for log events on queue `{0}`.'.format(settings.LOGGING_QUEUE))
+        channel.basic_consume(consume, queue=queue_name, no_ack=True)
+        log.info('Listening for data on queue `{0}`.'.format(queue_name))
 
         try:
             channel.start_consuming()
         except KeyboardInterrupt:
-            log.info('Halting log event monitoring.')
+            log.info('Halting monitoring for queue `{0}`.'.format(queue_name))
 

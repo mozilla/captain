@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from captain.projects import shove
@@ -9,7 +10,15 @@ from captain.projects.models import CommandLog
 log = logging.getLogger(__name__)
 
 
-def handle_log_event(log_key, return_code, output):
+def handle_log_event(data):
+    try:
+        log_key = data['log_key']
+        return_code = data['return_code']
+        output = data['output']
+    except KeyError:
+        log.warning('Could not parse incoming log event: `{0}`.'.format(data))
+        return
+
     try:
         command_log = CommandLog.objects.get(pk=log_key)
     except (CommandLog.DoesNotExist, ValueError):
@@ -28,4 +37,4 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # Log INFO events to make the commandline output a little more useful.
         logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=logging.INFO)
-        shove.consume_logs(handle_log_event)
+        shove.consume(settings.LOGGING_QUEUE, handle_log_event)
