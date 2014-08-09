@@ -3,7 +3,6 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import FormView, ListView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import FormMixin
 
 from guardian.mixins import LoginRequiredMixin
 from guardian.shortcuts import get_objects_for_user
@@ -41,10 +40,16 @@ class RunCommand(PermissionRequiredMixin, SingleObjectMixin, FormView):
         self.object = self.get_object()
         return super(RunCommand, self).dispatch(*args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super(RunCommand, self).get_form_kwargs()
+        kwargs['project'] = self.object
+        return kwargs
+
     def form_valid(self, form):
         """Send the submitted command to shove and redirect to the log list."""
         project = self.get_object()
-        project.send_command(self.request.user, form.cleaned_data['command'])
+        project.send_command(self.request.user, form.cleaned_data['command'],
+                             form.cleaned_data['shove_instances'])
         messages.success(self.request, 'Command sent successfully!')
         return redirect(project)
 
@@ -64,14 +69,16 @@ class RunCommand(PermissionRequiredMixin, SingleObjectMixin, FormView):
 
 
 class ProjectHistory(ListView):
-    """Show a list of all the log entries for commands run on a project."""
+    """
+    Show a list of all the log entries for commands run on a project.
+    """
     template_name = 'projects/details/history.html'
-    context_object_name = 'commands'
+    context_object_name = 'sent_commands'
     paginate_by = 25
 
     def get_queryset(self):
         self.project = get_object_or_404(Project, pk=self.kwargs['project_id'])
-        return self.project.commandlog_set.order_by('-sent')
+        return self.project.sentcommand_set.order_by('-sent')
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProjectHistory, self).get_context_data(*args, **kwargs)

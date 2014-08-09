@@ -11,21 +11,27 @@
         <th>User</th>
         <th>Command</th>
         <th>Date</th>
-        <th>Return Code</th>
-        <th>Log</th>
+        <th>Result</th>
+        <th></th>
       </tr>
-      {% for command in commands %}
-        <tr {% if not command.return_code is none -%}
-              class="{{ 'success' if command.success else 'danger' }}"
+      {% for sent_command in sent_commands %}
+        <tr {% if not sent_command.success is none -%}
+              class="{{ 'success' if sent_command.success else 'danger' }}"
             {%- endif %}>
-          <td>{{ user_display(command.user) if command.user else 'The Captain' }}</td>
-          <td>{{ command.command }}</td>
-          <td>{{ command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
-          <td>{{ command.return_code if not command.return_code is none else '' }}</td>
+          <td>{{ user_display(sent_command.user) if sent_command.user else 'The Captain' }}</td>
+          <td>{{ sent_command.command }}</td>
+          <td>{{ sent_command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
           <td>
-            {% if command.logfile %}
-              <a href="{{ command.logfile.url }}">View Log</a>
+            {% if sent_command.success is none %}
+              Pending
+            {% elif sent_command.success %}
+              Success
+            {% else %}
+              Failed
             {% endif %}
+          </td>
+          <td>
+            <a href="#">More Info</a>
           </td>
         </tr>
       {% else %}

@@ -6,11 +6,12 @@
 
 {% block tab_content %}
   <div class="run-command-panel panel panel-primary">
-    <div class="panel-heading"><h2 class="panel-title">Send a command. For a list of valid commands, see your project's <em>commands.procfile.<em></h2></div>
+    <div class="panel-heading"><h2 class="panel-title">Send a command. For a list of valid commands, see your project's <em>commands.procfile.</em></h2></div>
     <div class="panel-body">
       <form method="post" action="{{ url('projects.details.run_command', project.pk) }}">
         {{ csrf() }}
         {{ form_field(form.command) }}
+        {{ form_field(form.shove_instances) }}
         <button type="submit" class="btn btn-primary">Send</button>
       </form>
     </div>

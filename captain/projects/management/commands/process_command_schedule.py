@@ -1,7 +1,6 @@
 import logging
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from captain.projects.models import ScheduledCommand
 
@@ -22,8 +21,6 @@ class Command(BaseCommand):
                 log.info('Running `{0}` on project `{1}` for interval `{2}`'.format(
                          command.command, command.project.name,
                          command.get_interval_minutes_display()))
-                command.project.send_command(None, command.command)
-                command.last_run = timezone.now()
-                command.save()
+                command.run()
 
         log.info('Done!')

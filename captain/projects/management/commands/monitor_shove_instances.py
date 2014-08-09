@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from captain.projects import shove
-from captain.projects.models import ShoveInstance
+from captain.projects.models import Project, ShoveInstance
 
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,8 @@ def handle_heartbeat_event(data):
     try:
         routing_key = data['routing_key']
         hostname = data['hostname']
-    except KeyError:
+        project_names = data['project_names'].split(',')
+    except (KeyError, AttributeError):
         log.warning('Could not parse incoming heartbeat event: `{0}`.'.format(data))
         return
 
@@ -30,6 +31,22 @@ def handle_heartbeat_event(data):
     shove_instance.hostname = hostname
     shove_instance.last_heartbeat = timezone.now()
     shove_instance.active = True
+
+    # Add new projects.
+    projects = shove_instance.projects.all()
+    for project_name in project_names:
+        try:
+            project = Project.objects.get(project_name=project_name)
+            if project not in projects:
+                shove_instance.projects.add(project)
+        except Project.DoesNotExist:
+            log.error('Could not find project with project_name = `{0}`'.format(project_name))
+
+    # Remove old projects.
+    for project in projects:
+        if project.project_name not in project_names:
+            shove_instance.projects.remove(project)
+
     shove_instance.save()
 
 
