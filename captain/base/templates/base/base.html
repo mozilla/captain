@@ -6,6 +6,7 @@
 
     {% block site_css %}
       <link href="{{ static('css/bootstrap.min.css') }}" rel="stylesheet">
+      <link href="{{ static('css/bootstrap-theme.min.css') }}" rel="stylesheet">
       {{ browserid_css() }}
       <link href="{{ static('css/global.css') }}" rel="stylesheet">
     {% endblock %}
@@ -55,6 +56,7 @@
 
     {% block site_js %}
       <script src="{{ static('js/lib/jquery-2.0.3.min.js') }}"></script>
+      <script src="{{ static('js/lib/bootstrap.min.js') }}"></script>
       {{ browserid_js() }}
     {% endblock %}
   </body>
