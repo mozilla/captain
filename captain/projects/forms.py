@@ -26,9 +26,29 @@ class RunCommandForm(forms.Form):
 
 
 class CreateScheduledCommandForm(forms.ModelForm):
+    hostnames = forms.ModelMultipleChoiceField(
+        required=True, queryset=ShoveInstance.objects.none(),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        # Set queryset for hostnames field to instances from the
+        # given project.
+        project = kwargs.pop('project')
+        super(CreateScheduledCommandForm, self).__init__(*args, **kwargs)
+
+        self.fields['hostnames'].queryset = project.shove_instances.filter(active=True)
+
+    def clean_hostnames(self):
+        """
+        Convert list of models to comma-seperated hostnames that the
+        model expects.
+        """
+        shove_instances = self.cleaned_data['hostnames']
+        return ','.join([instance.hostname for instance in shove_instances])
+
     class Meta:
         model = ScheduledCommand
-        fields = ('command', 'interval_minutes')
+        fields = ('command', 'interval_minutes', 'hostnames')
         widgets = {
             'command': forms.TextInput(attrs={'class': 'form-control'}),
             'interval_minutes': forms.Select(attrs={'class': 'form-control'}),

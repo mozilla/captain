@@ -25,6 +25,10 @@ def handle_heartbeat_event(data):
         log.warning('Could not parse incoming heartbeat event: `{0}`.'.format(data))
         return
 
+    if not routing_key or not hostname:
+        log.warning('Heartbeat did not specify a hostname or routing key: `{0}`'.format(data))
+        return
+
     shove_instance, created = ShoveInstance.objects.get_or_create(routing_key=routing_key)
 
     log.info('Updating shove instance for routing key `{0}`.'.format(routing_key))

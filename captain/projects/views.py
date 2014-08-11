@@ -105,6 +105,11 @@ class Schedule(PermissionRequiredMixin, FormView):
                                          .order_by('interval_minutes'))
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super(Schedule, self).get_form_kwargs()
+        kwargs['project'] = self.object
+        return kwargs
+
     def form_valid(self, form):
         """Save the scheduled command and redirect back to the list."""
         command = form.save(commit=False)

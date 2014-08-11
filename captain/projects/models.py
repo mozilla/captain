@@ -67,8 +67,8 @@ class Project(models.Model):
 
 class ShoveInstance(models.Model):
     """An instance of shove running on a remote server."""
-    routing_key = models.CharField(max_length=255, unique=True)
-    hostname = models.CharField(max_length=255)
+    routing_key = models.CharField(max_length=255, unique=True, blank=False)
+    hostname = models.CharField(max_length=255, blank=False)
 
     active = models.BooleanField(default=False)
     last_heartbeat = models.DateTimeField(default=None, null=True)
@@ -131,7 +131,7 @@ class ScheduledCommand(models.Model):
         Queryset of ShoveInstances with hostnames matching the ones
         specified for this command.
         """
-        return ShoveInstance.objects.filter(hostname__in=self.hostnames.split(','))
+        return ShoveInstance.objects.filter(active=True, hostname__in=self.hostnames.split(','))
 
     def run(self):
         """

@@ -12,6 +12,7 @@
         <th>Created By</th>
         <th>Interval</th>
         <th>Last Run</th>
+        <th>Hostnames</th>
       </tr>
       {% for command in scheduled_commands %}
         <tr>
@@ -25,9 +26,16 @@
               Never
             {% endif %}
           </td>
+          <td>
+            <select multiple rows="3">
+              {% for hostname in command.hostnames.split(',') %}
+                <option>{{ hostname }}</option>
+              {% endfor %}
+            </select>
+          </td>
         </tr>
       {% else %}
-        <td colspan="4">No commands have been scheduled for this project yet.</td>
+        <td colspan="5">No commands have been scheduled for this project yet.</td>
       {% endfor %}
     </table>
 
@@ -38,6 +46,7 @@
           {{ csrf() }}
           {{ form_field(form.command) }}
           {{ form_field(form.interval_minutes) }}
+          {{ form_field(form.hostnames) }}
           <button type="submit" class="btn btn-primary">Save</button>
         </form>
       </div>
