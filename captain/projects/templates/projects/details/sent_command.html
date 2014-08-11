@@ -1,0 +1,68 @@
+{% extends 'projects/details/base.html' %}
+
+{% set page_id = 'history' %}
+
+{% block site_js %}
+  {{ super() }}
+  <script src="{{ static('js/sent_command.js') }}"></script>
+{% endblock %}
+
+{% block tab_content %}
+  <h2>Command Details</h2>
+
+  <dl class="dl-horizontal">
+    <dt>Sent by</dt>
+    <dd>{{ user_display(sent_command.user) }}</dd>
+
+    <dt>Command</dt>
+    <dd><code>{{ sent_command.command }}</code></dd>
+
+    <dt>Date</dt>
+    <dd>{{ sent_command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</dd>
+
+    <dt>Result</dt>
+    <dd>
+      {% if sent_command.success is none %}
+        <span class="label label-default">Pending</span>
+      {% elif sent_command.success %}
+        <span class="label label-success">Success</span>
+      {% else %}
+        <span class="label label-danger">Error</span>
+      {% endif %}
+    </dd>
+  </dl>
+
+  <h3>Individual Logs</h3>
+  <div class="panel-group" id="shove-logs">
+    {% for log in logs %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#shove-logs" href="#log-{{ log.pk }}">
+              {{ log.shove_instance.hostname }}
+            </a>
+          </h4>
+        </div>
+        {% if log.logfile %}
+          <div id="log-{{ log.pk }}" class="panel-collapse collapse not-loaded" data-log-url="{{ log.logfile.url }}">
+            <div class="panel-body">
+              <pre class="log-content">Loading log...</pre>
+            </div>
+          </div>
+        {% else %}
+          <div id="log-{{ log.pk }}" class="panel-collapse collapse">
+            <div class="panel-body">
+              <p>No log available.</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <p>No logs found for this command.</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -163,6 +163,9 @@ class SentCommand(models.Model):
         successes = [log.success for log in self.commandlog_set.all()]
         return None if None in successes else all(successes)
 
+    def get_absolute_url(self):
+        return reverse('projects.details.sent_command', args=(self.project.pk, self.pk))
+
 
 class CommandLog(models.Model):
     """Log of information about a single run of a command."""

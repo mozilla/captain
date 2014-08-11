@@ -18,7 +18,7 @@
         <tr {% if not sent_command.success is none -%}
               class="{{ 'success' if sent_command.success else 'danger' }}"
             {%- endif %}>
-          <td>{{ user_display(sent_command.user) if sent_command.user else 'The Captain' }}</td>
+          <td>{{ user_display(sent_command.user) }}</td>
           <td>{{ sent_command.command }}</td>
           <td>{{ sent_command.sent.strftime('%b %d, %Y %H:%M:%S %Z') }}</td>
           <td>
@@ -31,7 +31,7 @@
             {% endif %}
           </td>
           <td>
-            <a href="#">More Info</a>
+            <a href="{{ sent_command.get_absolute_url() }}">More Info</a>
           </td>
         </tr>
       {% else %}

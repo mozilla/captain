@@ -2,14 +2,14 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import FormView, ListView
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from guardian.mixins import LoginRequiredMixin
 from guardian.shortcuts import get_objects_for_user
 
 from captain.projects.forms import CreateScheduledCommandForm, RunCommandForm
 from captain.projects.mixins import PermissionRequiredMixin
-from captain.projects.models import Project
+from captain.projects.models import Project, SentCommand
 
 
 class AllProjects(ListView):
@@ -83,6 +83,21 @@ class ProjectHistory(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super(ProjectHistory, self).get_context_data(*args, **kwargs)
         context['project'] = self.project
+        return context
+
+
+class SentCommandDetails(DetailView):
+    model = SentCommand
+    context_object_name = 'sent_command'
+    template_name = 'projects/details/sent_command.html'
+
+    def get_queryset(self):
+        return SentCommand.objects.filter(project_id=self.kwargs['project_id'])
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(SentCommandDetails, self).get_context_data(*args, **kwargs)
+        context['project'] = Project.objects.get(id=self.kwargs['project_id'])
+        context['logs'] = self.object.commandlog_set.order_by('shove_instance__hostname')
         return context
 
 

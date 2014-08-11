@@ -14,4 +14,6 @@ urlpatterns = patterns('',
         name='projects.details.run_command'),
     url(r'^projects/(?P<project_id>\d+)/schedule$', views.Schedule.as_view(),
         name='projects.details.schedule'),
+    url(r'^projects/(?P<project_id>\d+)/sent_command/(?P<pk>\d+)$',
+        views.SentCommandDetails.as_view(), name='projects.details.sent_command'),
 )
