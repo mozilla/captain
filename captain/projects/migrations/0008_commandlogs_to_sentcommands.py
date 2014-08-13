@@ -10,9 +10,13 @@ class Migration(DataMigration):
         """
         for log in orm.CommandLog.objects.all():
             sent_command = orm.SentCommand.objects.create(project=log.project, user=log.user,
-                                                          command=log.command, sent=log.sent)
+                                                          command=log.command)
             log.sent_command = sent_command
             log.save()
+
+            # Add sent after initial save to get past auto_now_add.
+            sent_command.sent = log.sent
+            sent_command.save()
 
     def backwards(self, orm):
         pass  # Not really possible to go backwards here, not that we

@@ -44,7 +44,7 @@ def handle_heartbeat_event(data):
             if project not in projects:
                 shove_instance.projects.add(project)
         except Project.DoesNotExist:
-            log.error('Could not find project with project_name = `{0}`'.format(project_name))
+            log.warning('Could not find project with project_name = `{0}`'.format(project_name))
 
     # Remove old projects.
     for project in projects:

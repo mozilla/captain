@@ -1,15 +1,14 @@
-from datetime import datetime
-
 from django.core.urlresolvers import reverse
 
 from django_nose.tools import assert_equal, assert_true
 from guardian.shortcuts import assign_perm
 from mock import Mock, patch
 
-from captain.base.tests import TestCase
+from captain.base.tests import aware_datetime, CONTAINS, TestCase
 from captain.projects import views
 from captain.projects.models import ScheduledCommand
-from captain.projects.tests import CommandLogFactory, ProjectFactory
+from captain.projects.tests import (CommandLogFactory, ProjectFactory, SentCommandFactory,
+                                    ShoveInstanceFactory)
 from captain.users.tests import UserFactory
 
 
@@ -68,10 +67,14 @@ class RunCommandTests(TestCase):
         self.project.send_command = Mock()
         get_object.return_value = self.project
 
+        instance1, instance2 = ShoveInstanceFactory.create_batch(2, active=True)
+        self.project.shove_instances.add(instance1, instance2)
+
         user = self._login_user(True)
-        response = self._run_command(command='blah')
+        response = self._run_command(command='blah', shove_instances=[instance1.pk, instance2.pk])
         self.assertRedirects(response, self.project.get_absolute_url())
-        self.project.send_command.assert_called_once_with(user, 'blah')
+        self.project.send_command.assert_called_once_with(user, 'blah',
+                                                          CONTAINS(instance1, instance2))
 
 
 class ProjectHistoryTests(TestCase):
@@ -82,21 +85,23 @@ class ProjectHistoryTests(TestCase):
 
     def test_get_queryset(self):
         """
-        The queryset being displayed should be all the command logs for the project, sorted by the
-        time they were sent in reverse.
+        The queryset being displayed should be all the sent commands for
+        the project, sorted by the time they were sent in reverse.
         """
         project = ProjectFactory.create()
-        log1 = CommandLogFactory.create(project=project, sent=datetime(2013, 4, 1))
-        log2 = CommandLogFactory.create(project=project, sent=datetime(2013, 4, 2))
-        log3 = CommandLogFactory.create(project=project, sent=datetime(2013, 4, 3))
+        command1 = SentCommandFactory.create(project=project, sent=aware_datetime(2013, 4, 1))
+        command2 = SentCommandFactory.create(project=project, sent=aware_datetime(2013, 4, 2))
+        command3 = SentCommandFactory.create(project=project, sent=aware_datetime(2013, 4, 3))
 
         view = views.ProjectHistory(kwargs={'project_id': project.id})
-        assert_equal(list(view.get_queryset()), [log3, log2, log1])
+        assert_equal(list(view.get_queryset()), [command3, command2, command1])
 
 
 class ScheduleTests(TestCase):
     def setUp(self):
         self.project = ProjectFactory.create()
+        self.shove_instances = ShoveInstanceFactory.create_batch(2)
+        self.project.shove_instances.add(*self.shove_instances)
         self.url = reverse('projects.details.schedule', args=(self.project.pk,))
 
     def _schedule(self, **kwargs):
@@ -111,7 +116,8 @@ class ScheduleTests(TestCase):
 
     def test_not_logged_in(self):
         """If the user is not authenticated, redirect them to the login page."""
-        response = self._schedule(command='blah', interval_minutes=15)
+        response = self._schedule(command='blah', interval_minutes=15,
+                                  hostnames=[s.id for s in self.shove_instances])
         self.assertRedirects(response, '{0}?next={1}'.format(reverse('users.login'), self.url))
 
     def test_permission_required(self):
@@ -120,7 +126,8 @@ class ScheduleTests(TestCase):
         to the history page.
         """
         self._login_user(False)
-        response = self._schedule(command='blah', interval_minutes=15)
+        response = self._schedule(command='blah', interval_minutes=15,
+                                  hostnames=[s.id for s in self.shove_instances])
         self.assertRedirects(response,
                              reverse('projects.details.history', args=(self.project.pk,)))
 
@@ -135,8 +142,37 @@ class ScheduleTests(TestCase):
         the schedule.
         """
         user = self._login_user(True)
-        response = self._schedule(command='blah', interval_minutes=15)
+        response = self._schedule(command='blah', interval_minutes=15,
+                                  hostnames=[s.id for s in self.shove_instances])
         assert_true(ScheduledCommand.objects
-                    .filter(project=self.project, user=user, command='blah', interval_minutes=15)
+                    .filter(project=self.project, user=user, command='blah', interval_minutes=15,
+                            hostnames=','.join([s.hostname for s in self.shove_instances]))
                     .exists())
         self.assertRedirects(response, self.url)
+
+
+class SentCommandDetailsTests(TestCase):
+    def test_get_queryset(self):
+        """
+        Restrict matched SentCommands to ones belonging to the project
+        matching the ID in the URL.
+        """
+        project = ProjectFactory.create()
+        command1 = SentCommandFactory.create(project=project)
+        SentCommandFactory.create()  # Should not be in results.
+
+        view = views.SentCommandDetails()
+        view.kwargs = {'project_id': project.id}
+        assert_equal(list(view.get_queryset()), [command1])
+
+    def test_get_context_data(self):
+        sent_command = SentCommandFactory.create()
+        log1, log2 = CommandLogFactory.create_batch(2, sent_command=sent_command)
+
+        view = views.SentCommandDetails()
+        view.kwargs = {'project_id': sent_command.project.id}
+        view.object = sent_command  # Required for get_context_data.
+
+        ctx = view.get_context_data()
+        assert_equal(ctx['project'], sent_command.project)
+        assert_equal(list(ctx['logs']), [log1, log2])

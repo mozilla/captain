@@ -2,7 +2,7 @@ import json
 
 from django.test.utils import override_settings
 
-from django_nose.tools import assert_equal, assert_raises, assert_true
+from django_nose.tools import assert_equal, assert_false, assert_raises, assert_true
 from mock import ANY, Mock, patch
 
 from captain.base.tests import TestCase
@@ -53,87 +53,42 @@ class SendCommandTests(MockConnectTestCase):
         assert_true(self.connection.close.called)
 
 
-@override_settings(LOGGING_QUEUE='test_log_queue')
-class SendHeartbeatTests(MockConnectTestCase):
-    def test_basic_heartbeat(self):
-        heartbeat_json = '{"heartbeat": true}'
-
-        shove.send_heartbeat(['foo', 'bar'])
-
-        self.channel.queue_declare.assert_any_call(queue='foo', durable=True)
-        self.channel.basic_publish.assert_any_call(exchange='', routing_key='foo',
-                                                   body=heartbeat_json)
-        self.channel.queue_declare.assert_any_call(queue='bar', durable=True)
-        self.channel.basic_publish.assert_any_call(exchange='', routing_key='bar',
-                                                   body=heartbeat_json)
-        assert_true(self.connection.close.called)
-
-    def test_always_close(self):
-        """Ensure that the connection is closed even if an exception is thrown."""
-        self.channel.queue_declare.side_effect = IOError
-
-        with assert_raises(IOError):
-            shove.send_heartbeat(['foo', 'bar'])
-        assert_true(self.connection.close.called)
-
-
-@override_settings(LOGGING_QUEUE='test_log_queue')
-class ConsumeLogsTests(MockConnectTestCase):
-    def _get_consume(self, callback):
-        shove.consume_logs(callback)
-        return self.channel.basic_consume.call_args[0][0]
-
+class ConsumeTests(MockConnectTestCase):
     def test_stats_consuming(self):
-        """Ensure that calling consume_logs will set up a consumer on the logging queue."""
+        """
+        Ensure that calling consume will set up a consumer on the
+        requested queue.
+        """
         callback = Mock()
-        shove.consume_logs(callback)
+        shove.consume('myqueue', callback)
 
-        self.channel.queue_declare.assert_called_once_with(queue='test_log_queue', durable=True)
-        self.channel.basic_consume.assert_called_once_with(ANY, queue='test_log_queue',
-                                                           no_ack=True)
+        self.channel.queue_declare.assert_called_once_with(queue='myqueue', durable=True)
+        self.channel.basic_consume.assert_called_once_with(ANY, queue='myqueue', no_ack=True)
         assert_true(self.channel.start_consuming.called)
         assert_true(self.connection.close.called)
 
-    def test_consumer_arguments(self):
+    def test_consumer_json(self):
         """
-        The consumer should parse incoming logging events as JSON and pass the log_key and output
-        arguments to the callback.
-        """
-        callback = Mock()
-        consume = self._get_consume(callback)
-
-        consume(self.channel, Mock(), Mock(),
-                '{"log_key": 75, "output": "test output", "version": "1.0", "return_code": 0}')
-        callback.assert_called_once_with(75, 0, 'test output')
-
-    @patch('captain.projects.shove.log')
-    def test_consumer_invalid_json(self, log):
-        """If the consumer receives invalid JSON, it should log it and return."""
-        callback = Mock()
-        consume = self._get_consume(callback)
-
-        consume(self.channel, Mock(), Mock(), 'asdfas__EWtwet')
-        assert_true(log.warning.called)
-        assert_true(not callback.called)
-
-    @patch('captain.projects.shove.log')
-    def test_consumer_incorrect_response(self, log):
-        """If the consumer receives an incorrect response, it should log it and return."""
-        callback = Mock()
-        consume = self._get_consume(callback)
-
-        consume(self.channel, Mock(), Mock(), '{"blah": "foo", "BAR": 3}')
-        assert_true(log.warning.called)
-        assert_true(not callback.called)
-
-    @patch('captain.projects.shove.log')
-    def test_consumer_heartbeat(self, log):
-        """
-        If the consumer receives a heartbeat command, it should return.
+        The consumer listening to RabbitMQ should parse incoming data as
+        JSON and then pass it to the callback.
         """
         callback = Mock()
-        consume = self._get_consume(callback)
+        shove.consume('myqueue', callback)
 
-        consume(self.channel, Mock(), Mock(), '{"heartbeat": true}')
-        assert_true(not log.warning.called)
-        assert_true(not callback.called)
+        consumer = self.channel.basic_consume.call_args[0][0]
+        consumer(None, None, None, '{"foo": "bar", "baz": 1}')
+        callback.assert_called_with({'foo': 'bar', 'baz': 1})
+
+    def test_consumer_json_invalid(self):
+        """
+        If the incoming data is invalid JSON, log a warning and do not
+        call the callback.
+        """
+        callback = Mock()
+        shove.consume('myqueue', callback)
+        consumer = self.channel.basic_consume.call_args[0][0]
+
+        with patch('captain.projects.shove.log') as log:
+            consumer(None, None, None, 'invalid{json}')
+            assert_false(callback.called)
+            assert_true(log.warning.called)

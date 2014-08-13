@@ -55,14 +55,14 @@ class Project(models.Model):
 
         sent_command = SentCommand.objects.create(project=self, user=user, command=command)
         for shove_instance in shove_instances:
-            shove_instance.send_command(self, command, sent_command)
+            shove_instance.send_command(self, sent_command)
         return sent_command
 
     def get_absolute_url(self):
         return reverse('projects.details.history', args=(self.pk,))
 
     def __unicode__(self):
-        return u'<Project {0}>'.format(self.name)
+        return self.name
 
 
 class ShoveInstance(models.Model):
@@ -73,7 +73,7 @@ class ShoveInstance(models.Model):
     active = models.BooleanField(default=False)
     last_heartbeat = models.DateTimeField(default=None, null=True)
 
-    def send_command(self, project, command, sent_command):
+    def send_command(self, project, sent_command):
         """
         Send a command to be executed by this ShoveInstance.
 
@@ -81,14 +81,11 @@ class ShoveInstance(models.Model):
             Project instance for the project to run the given command
             on.
 
-        :param command:
-            Name of the command to execute.
-
         :param sent_command:
             SentCommand instance to log the results of this command to.
         """
         log = CommandLog.objects.create(shove_instance=self, sent_command=sent_command)
-        shove.send_command(self.routing_key, project.project_name, command, log.pk)
+        shove.send_command(self.routing_key, project.project_name, sent_command.command, log.pk)
         return log
 
     def __unicode__(self):

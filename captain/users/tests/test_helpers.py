@@ -34,3 +34,7 @@ class TestUserDisplay(TestCase):
         user.profile.display_name = 'foo<span>bar</span>'
         output = user_display(user)
         assert_true(output.endswith('foo&lt;span&gt;bar&lt;/span&gt;'))
+
+    def test_user_none(self):
+        """If the given user is None, return a filler name."""
+        assert_equal(user_display(None), 'The Captain')

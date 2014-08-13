@@ -46,7 +46,7 @@ def send_command(queue, project_name, command, log_key):
     """
     with closing(create_connection()) as connection:
         channel = connection.channel()
-        channel.queue_declare(queue=queue)
+        channel.queue_declare(queue=queue, durable=True)
 
         body = json.dumps({
             'version': '1.0',  # Version of the command format.
