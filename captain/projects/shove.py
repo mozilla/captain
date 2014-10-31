@@ -19,7 +19,8 @@ def create_connection():
         credentials=pika.credentials.PlainCredentials(
             settings.RABBITMQ_USER,
             settings.RABBITMQ_PASS
-        )
+        ),
+        heartbeat_interval=600,
     )
     return pika.BlockingConnection(parameters)
 
