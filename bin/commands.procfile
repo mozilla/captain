@@ -1,1 +1,2 @@
 push_application: python bin/update/update.py
+push_application_webhead: python bin/update/update_webhead.py
